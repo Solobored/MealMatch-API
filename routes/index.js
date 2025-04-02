@@ -4,7 +4,6 @@ import recipeRoutes from './recipe.routes.js';
 
 const router = express.Router();
 
-// API routes
 router.use('/api/users', userRoutes);
 router.use('/api/recipes', recipeRoutes);
 

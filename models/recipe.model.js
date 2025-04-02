@@ -69,7 +69,6 @@ const recipeSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Add text index for search functionality
 recipeSchema.index({ name: 'text', description: 'text', 'ingredients.name': 'text' });
 
 const Recipe = mongoose.model('Recipe', recipeSchema);
