@@ -3,7 +3,7 @@ import cors from 'cors';
 import { connectToDatabase } from './config/db.config.js';
 import routes from './routes/index.js';
 import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from './swagger/swagger.json' assert { type: 'json' };
+import swaggerDocument from './swagger/swagger.json' with { type: 'json' };
 
 const app = express();
 
