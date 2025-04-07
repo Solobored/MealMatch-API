@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import bcrypt from "bcrypt"
+import bcryptjs from "bcryptjs" // Changed from bcrypt to bcryptjs
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -40,8 +40,8 @@ userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next()
 
   try {
-    const salt = await bcrypt.genSalt(10)
-    this.password = await bcrypt.hash(this.password, salt)
+    const salt = await bcryptjs.genSalt(10)
+    this.password = await bcryptjs.hash(this.password, salt)
     this.updatedAt = Date.now()
     next()
   } catch (error) {
@@ -51,7 +51,7 @@ userSchema.pre("save", async function (next) {
 
 // Method to compare passwords
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password)
+  return bcryptjs.compare(candidatePassword, this.password)
 }
 
 const User = mongoose.model("User", userSchema)
