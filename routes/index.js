@@ -1,10 +1,18 @@
-import express from 'express';
-import userRoutes from './user.routes.js';
-import recipeRoutes from './recipe.routes.js';
+import express from "express"
+import userRoutes from "./userRoutes.js"
+import recipeRoutes from "./recipeRoutes.js"
+import ingredientRoutes from "./ingredientRoutes.js"
+import favoriteRoutes from "./favoriteRoutes.js"
+import authRoutes from "./authRoutes.js"
 
-const router = express.Router();
+const router = express.Router()
 
-router.use('/api/users', userRoutes);
-router.use('/api/recipes', recipeRoutes);
+// Mount routes
+router.use("/users", userRoutes)
+router.use("/recipes", recipeRoutes)
+router.use("/ingredients", ingredientRoutes)
+router.use("/favorites", favoriteRoutes)
+router.use("/auth", authRoutes)
 
-export default router;
+export default router
+

@@ -1,38 +1,53 @@
-import express from 'express';
-import cors from 'cors';
-import { connectToDatabase } from './config/db.config.js';
-import routes from './routes/index.js';
-import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from './swagger/swagger.json' with { type: 'json' };
+import express from "express"
+import cors from "cors"
+import dotenv from "dotenv"
+import swaggerUi from "swagger-ui-express"
+import passport from "passport"
+import session from "express-session"
 
-const app = express();
+// Import routes
+import routes from "./routes/index.js"
+
+// Import swagger docs and passport config
+import swaggerDocs from "./config/swagger.js"
+import { initializePassport } from "./middleware/auth.js"
+
+// Load environment variables
+dotenv.config()
+
+// Initialize Express app
+const app = express()
 
 // Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors())
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-// Connect to MongoDB
-connectToDatabase();
+// Session configuration for OAuth
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === "production" },
+  }),
+)
 
-// Routes
-app.use('/', routes);
+// Initialize Passport
+app.use(passport.initialize())
+app.use(passport.session())
+initializePassport()
 
 // Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs))
+
+// Routes
+app.use("/api", routes)
 
 // Root route
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to MealMatch API' });
-});
+app.get("/", (req, res) => {
+  res.send("Welcome to MealMatch API. Visit /api-docs for documentation.")
+})
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : {}
-  });
-});
+export default app
 
-export default app;

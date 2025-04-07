@@ -2,1053 +2,238 @@
   "openapi": "3.0.0",
   "info": {
     "title": "MealMatch API",
-    "description": "API for MealMatch application",
+    "description": "API for MealMatch recipe application",
+    "version": "1.0.0",
     "contact": {
       "name": "API Support",
       "email": "support@mealmatch.com"
-    },
-    "version": "1.0.0"
+    }
   },
   "servers": [
     {
       "url": "http://localhost:3000",
       "description": "Development server"
-    },
-    {
-      "url": "https://mealmatch-api.onrender.com",
-      "description": "Production server"
     }
   ],
-  "paths": {
-    "/api/users": {
-      "post": {
-        "tags": ["Users"],
-        "summary": "Create a new user",
-        "description": "Register a new user in the system",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "User created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error or user already exists",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": ["Users"],
-        "summary": "Get all users",
-        "description": "Retrieve a list of all users",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of users",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/users/login": {
-      "post": {
-        "tags": ["Users"],
-        "summary": "User login",
-        "description": "Login a user and get authentication token",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["email", "password"],
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "password": {
-                    "type": "string",
-                    "format": "password"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Login successful",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/users/{userId}": {
-      "get": {
-        "tags": ["Users"],
-        "summary": "Get user by ID",
-        "description": "Retrieve a specific user by their ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "description": "ID of the user to retrieve",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": ["Users"],
-        "summary": "Update user",
-        "description": "Update a specific user by their ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "description": "ID of the user to update",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UserUpdateInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "User updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": ["Users"],
-        "summary": "Delete user",
-        "description": "Delete a specific user by their ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "description": "ID of the user to delete",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "User deleted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "User deleted successfully"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/recipes": {
-      "post": {
-        "tags": ["Recipes"],
-        "summary": "Create a new recipe",
-        "description": "Create a new recipe in the system",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecipeInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Recipe created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Recipe"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": ["Recipes"],
-        "summary": "Get all recipes",
-        "description": "Retrieve a list of all recipes with optional filtering",
-        "parameters": [
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Search term for recipe name, description, or ingredients",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "difficulty",
-            "in": "query",
-            "description": "Filter by difficulty level",
-            "schema": {
-              "type": "string",
-              "enum": ["Easy", "Medium", "Hard"]
-            }
-          },
-          {
-            "name": "tags",
-            "in": "query",
-            "description": "Filter by tags (comma-separated)",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "ingredients",
-            "in": "query",
-            "description": "Filter by ingredients (comma-separated)",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Page number for pagination",
-            "schema": {
-              "type": "integer",
-              "default": 1
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Number of items per page",
-            "schema": {
-              "type": "integer",
-              "default": 10
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of recipes",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "recipes": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Recipe"
-                      }
-                    },
-                    "page": {
-                      "type": "integer"
-                    },
-                    "limit": {
-                      "type": "integer"
-                    },
-                    "totalPages": {
-                      "type": "integer"
-                    },
-                    "totalRecipes": {
-                      "type": "integer"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/recipes/{recipeId}": {
-      "get": {
-        "tags": ["Recipes"],
-        "summary": "Get recipe by ID",
-        "description": "Retrieve a specific recipe by its ID",
-        "parameters": [
-          {
-            "name": "recipeId",
-            "in": "path",
-            "required": true,
-            "description": "ID of the recipe to retrieve",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Recipe found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Recipe"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Recipe not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": ["Recipes"],
-        "summary": "Update recipe",
-        "description": "Update a specific recipe by its ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "recipeId",
-            "in": "path",
-            "required": true,
-            "description": "ID of the recipe to update",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RecipeInput"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Recipe updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Recipe"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Recipe not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - Not the creator of the recipe",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": ["Recipes"],
-        "summary": "Delete recipe",
-        "description": "Delete a specific recipe by its ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "recipeId",
-            "in": "path",
-            "required": true,
-            "description": "ID of the recipe to delete",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Recipe deleted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Recipe deleted successfully"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Recipe not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden - Not the creator of the recipe",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
   "components": {
-    "schemas": {
-      "UserInput": {
-        "type": "object",
-        "required": ["username", "email", "password"],
-        "properties": {
-          "username": {
-            "type": "string",
-            "minLength": 3,
-            "example": "johndoe"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "john@example.com"
-          },
-          "password": {
-            "type": "string",
-            "format": "password",
-            "minLength": 6,
-            "example": "password123"
-          },
-          "firstName": {
-            "type": "string",
-            "example": "John"
-          },
-          "lastName": {
-            "type": "string",
-            "example": "Doe"
-          }
-        }
-      },
-      "UserUpdateInput": {
-        "type": "object",
-        "properties": {
-          "username": {
-            "type": "string",
-            "minLength": 3,
-            "example": "johndoe"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "john@example.com"
-          },
-          "firstName": {
-            "type": "string",
-            "example": "John"
-          },
-          "lastName": {
-            "type": "string",
-            "example": "Doe"
-          }
-        }
-      },
-      "User": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string",
-            "example": "60d21b4667d0d8992e610c85"
-          },
-          "username": {
-            "type": "string",
-            "example": "johndoe"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "john@example.com"
-          },
-          "firstName": {
-            "type": "string",
-            "example": "John"
-          },
-          "lastName": {
-            "type": "string",
-            "example": "Doe"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "UserResponse": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string",
-            "example": "60d21b4667d0d8992e610c85"
-          },
-          "username": {
-            "type": "string",
-            "example": "johndoe"
-          },
-          "email": {
-            "type": "string",
-            "format": "email",
-            "example": "john@example.com"
-          },
-          "firstName": {
-            "type": "string",
-            "example": "John"
-          },
-          "lastName": {
-            "type": "string",
-            "example": "Doe"
-          },
-          "token": {
-            "type": "string",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-          }
-        }
-      },
-      "RecipeInput": {
-        "type": "object",
-        "required": ["name", "ingredients", "instructions"],
-        "properties": {
-          "name": {
-            "type": "string",
-            "example": "Spaghetti Carbonara"
-          },
-          "description": {
-            "type": "string",
-            "example": "A classic Italian pasta dish"
-          },
-          "ingredients": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["name"],
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "example": "Spaghetti"
-                },
-                "quantity": {
-                  "type": "string",
-                  "example": "200"
-                },
-                "unit": {
-                  "type": "string",
-                  "example": "g"
-                }
-              }
-            }
-          },
-          "instructions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "example": ["Boil pasta", "Cook bacon", "Mix eggs and cheese", "Combine all ingredients"]
-          },
-          "prepTime": {
-            "type": "number",
-            "example": 10
-          },
-          "cookTime": {
-            "type": "number",
-            "example": 15
-          },
-          "servings": {
-            "type": "number",
-            "example": 4
-          },
-          "difficulty": {
-            "type": "string",
-            "enum": ["Easy", "Medium", "Hard"],
-            "example": "Medium"
-          },
-          "imageUrl": {
-            "type": "string",
-            "example": "https://example.com/images/carbonara.jpg"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "example": ["Italian", "Pasta", "Quick"]
-          }
-        }
-      },
-      "Recipe": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string",
-            "example": "60d21b4667d0d8992e610c85"
-          },
-          "name": {
-            "type": "string",
-            "example": "Spaghetti Carbonara"
-          },
-          "description": {
-            "type": "string",
-            "example": "A classic Italian pasta dish"
-          },
-          "ingredients": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "example": "Spaghetti"
-                },
-                "quantity": {
-                  "type": "string",
-                  "example": "200"
-                },
-                "unit": {
-                  "type": "string",
-                  "example": "g"
-                }
-              }
-            }
-          },
-          "instructions": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "example": ["Boil pasta", "Cook bacon", "Mix eggs and cheese", "Combine all ingredients"]
-          },
-          "prepTime": {
-            "type": "number",
-            "example": 10
-          },
-          "cookTime": {
-            "type": "number",
-            "example": 15
-          },
-          "servings": {
-            "type": "number",
-            "example": 4
-          },
-          "difficulty": {
-            "type": "string",
-            "enum": ["Easy", "Medium", "Hard"],
-            "example": "Medium"
-          },
-          "imageUrl": {
-            "type": "string",
-            "example": "https://example.com/images/carbonara.jpg"
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "example": ["Italian", "Pasta", "Quick"]
-          },
-          "createdBy": {
-            "type": "string",
-            "example": "60d21b4667d0d8992e610c85"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
-      "Error": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": ["username", "email", "password"],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "User ID"
+          },
+          "username": {
+            "type": "string",
+            "description": "User's username"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email"
+          },
+          "googleId": {
+            "type": "string",
+            "description": "Google ID for OAuth users"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        }
+      },
+      "Recipe": {
+        "type": "object",
+        "required": ["title", "description", "ingredients", "instructions", "cookingTime", "userId"],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Recipe ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Recipe title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Recipe description"
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of ingredients"
+          },
+          "instructions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Step-by-step instructions"
+          },
+          "cookingTime": {
+            "type": "integer",
+            "description": "Cooking time in minutes"
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["Easy", "Medium", "Hard"],
+            "description": "Recipe difficulty level"
+          },
+          "servings": {
+            "type": "integer",
+            "description": "Number of servings"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Recipe tags"
+          },
+          "image": {
+            "type": "string",
+            "description": "URL to recipe image"
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID of user who created the recipe"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        }
+      },
+      "Ingredient": {
+        "type": "object",
+        "required": ["name", "category"],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Ingredient ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Ingredient name"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["Protein", "Vegetable", "Fruit", "Grain", "Dairy", "Spice", "Other"],
+            "description": "Ingredient category"
+          },
+          "nutritionalInfo": {
+            "type": "object",
+            "properties": {
+              "calories": {
+                "type": "number",
+                "description": "Calories per serving"
+              },
+              "protein": {
+                "type": "number",
+                "description": "Protein content in grams"
+              },
+              "carbs": {
+                "type": "number",
+                "description": "Carbohydrate content in grams"
+              },
+              "fat": {
+                "type": "number",
+                "description": "Fat content in grams"
+              }
+            },
+            "description": "Nutritional information"
+          },
+          "commonUses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Common uses for this ingredient"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
+          }
+        }
+      },
+      "Favorite": {
+        "type": "object",
+        "required": ["userId", "recipeId"],
+        "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Favorite ID"
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID of user who favorited the recipe"
+          },
+          "recipeId": {
+            "type": "string",
+            "description": "ID of favorited recipe"
+          },
+          "notes": {
+            "type": "string",
+            "description": "User notes about the recipe"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          }
+        }
+      }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "Users",
+      "description": "User management endpoints"
+    },
+    {
+      "name": "Recipes",
+      "description": "Recipe management endpoints"
+    },
+    {
+      "name": "Ingredients",
+      "description": "Ingredient management endpoints"
+    },
+    {
+      "name": "Favorites",
+      "description": "User favorites management endpoints"
+    },
+    {
+      "name": "Authentication",
+      "description": "Authentication endpoints"
+    }
+  ]
 }
+

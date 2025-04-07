@@ -1,64 +1,39 @@
-import swaggerJsdoc from 'swagger-jsdoc';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import swaggerJsDoc from "swagger-jsdoc"
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const options = {
+const swaggerOptions = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'MealMatch API',
-      version: '1.0.0',
-      description: 'API for MealMatch application',
+      title: "MealMatch API",
+      version: "1.0.0",
+      description: "API for MealMatch recipe application",
       contact: {
-        name: 'API Support',
-        email: 'support@mealmatch.com'
-      }
+        name: "API Support",
+        email: "support@mealmatch.com",
+      },
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Development server'
+        url:
+          process.env.NODE_ENV === "production"
+            ? "https://your-production-url.com"
+            : `http://localhost:${process.env.PORT || 3000}`,
       },
-      {
-        url: 'https://mealmatch-api.onrender.com',
-        description: 'Production server'
-      }
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT'
-        }
-      }
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
     },
-    security: [
-      {
-        bearerAuth: []
-      }
-    ]
   },
-  apis: ['./routes/*.js']
-};
-
-const specs = swaggerJsdoc(options);
-
-// Write swagger.json file
-const swaggerOutputPath = path.resolve(__dirname, '../swagger/swagger.json');
-
-// Ensure directory exists
-const swaggerDir = path.dirname(swaggerOutputPath);
-if (!fs.existsSync(swaggerDir)) {
-  fs.mkdirSync(swaggerDir, { recursive: true });
+  apis: ["./routes/*.js", "./swagger/*.js"],
 }
 
-fs.writeFileSync(swaggerOutputPath, JSON.stringify(specs, null, 2));
+const swaggerDocs = swaggerJsDoc(swaggerOptions)
 
-console.log(`Swagger JSON file written to: ${swaggerOutputPath}`);
+export default swaggerDocs
 
-export default specs;
