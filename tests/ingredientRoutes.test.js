@@ -5,10 +5,12 @@ import Ingredient from "../models/ingredient.js"
 
 describe("Ingredient API Routes", () => {
   beforeAll(async () => {
+    // Connect to test database
     await connectDB()
   })
 
   afterAll(async () => {
+    // Disconnect from test database
     await mongoose.connection.close()
   })
 
@@ -21,8 +23,11 @@ describe("Ingredient API Routes", () => {
   })
 
   describe("GET /api/ingredients/:id", () => {
-    it("should get an ingredient by ID", async () => {
-      const testIngredient = new Ingredient({
+    let testIngredient
+
+    beforeEach(async () => {
+      // Create a test ingredient
+      testIngredient = new Ingredient({
         name: "Test Ingredient",
         category: "Vegetable",
         nutritionalInfo: {
@@ -34,13 +39,20 @@ describe("Ingredient API Routes", () => {
         commonUses: ["Salads", "Soups"],
       })
       await testIngredient.save()
+    })
 
+    afterEach(async () => {
+      // Clean up
+      if (testIngredient && testIngredient._id) {
+        await Ingredient.findByIdAndDelete(testIngredient._id)
+      }
+    })
+
+    it("should get an ingredient by ID", async () => {
       const response = await request(app).get(`/api/ingredients/${testIngredient._id}`)
       expect(response.status).toBe(200)
       expect(response.body.name).toBe("Test Ingredient")
       expect(response.body.category).toBe("Vegetable")
-
-      await Ingredient.findByIdAndDelete(testIngredient._id)
     })
 
     it("should return 404 for non-existent ingredient", async () => {

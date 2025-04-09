@@ -7,6 +7,9 @@ describe("User API Routes", () => {
   beforeAll(async () => {
     // Connect to test database
     await connectDB()
+
+    // Clean up any existing test users
+    await User.deleteOne({ email: "test@example.com" })
   })
 
   afterAll(async () => {
@@ -23,21 +26,30 @@ describe("User API Routes", () => {
   })
 
   describe("GET /api/users/:id", () => {
-    it("should get a user by ID", async () => {
-      // First create a user to test with
-      const testUser = new User({
+    let testUser
+
+    beforeEach(async () => {
+      // Create a test user
+      testUser = new User({
         username: "testuser",
         email: "test@example.com",
         password: "password123",
       })
       await testUser.save()
+    })
 
+    afterEach(async () => {
+      // Clean up
+      if (testUser && testUser._id) {
+        await User.findByIdAndDelete(testUser._id)
+      }
+    })
+
+    it("should get a user by ID", async () => {
       const response = await request(app).get(`/api/users/${testUser._id}`)
       expect(response.status).toBe(200)
       expect(response.body.username).toBe("testuser")
       expect(response.body.email).toBe("test@example.com")
-
-      await User.findByIdAndDelete(testUser._id)
     })
 
     it("should return 404 for non-existent user", async () => {

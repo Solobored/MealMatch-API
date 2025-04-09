@@ -10,8 +10,13 @@ describe("Recipe API Routes", () => {
   let authToken
 
   beforeAll(async () => {
+    // Connect to test database
     await connectDB()
 
+    // Clean up any existing test users first
+    await User.deleteOne({ email: "recipe@example.com" })
+
+    // Create a test user
     testUser = new User({
       username: "recipeuser",
       email: "recipe@example.com",
@@ -19,12 +24,17 @@ describe("Recipe API Routes", () => {
     })
     await testUser.save()
 
+    // Generate auth token
     authToken = jwt.sign({ id: testUser._id, email: testUser.email }, process.env.JWT_SECRET, { expiresIn: "1h" })
   })
 
   afterAll(async () => {
-    await User.findByIdAndDelete(testUser._id)
+    // Clean up
+    if (testUser && testUser._id) {
+      await User.findByIdAndDelete(testUser._id)
+    }
 
+    // Disconnect from test database
     await mongoose.connection.close()
   })
 
@@ -37,9 +47,11 @@ describe("Recipe API Routes", () => {
   })
 
   describe("GET /api/recipes/:id", () => {
-    it("should get a recipe by ID", async () => {
-      // First create a recipe to test with
-      const testRecipe = new Recipe({
+    let testRecipe
+
+    beforeEach(async () => {
+      // Create a test recipe
+      testRecipe = new Recipe({
         title: "Test Recipe",
         description: "This is a test recipe",
         ingredients: ["Ingredient 1", "Ingredient 2"],
@@ -48,12 +60,19 @@ describe("Recipe API Routes", () => {
         userId: testUser._id,
       })
       await testRecipe.save()
+    })
 
+    afterEach(async () => {
+      // Clean up
+      if (testRecipe && testRecipe._id) {
+        await Recipe.findByIdAndDelete(testRecipe._id)
+      }
+    })
+
+    it("should get a recipe by ID", async () => {
       const response = await request(app).get(`/api/recipes/${testRecipe._id}`)
       expect(response.status).toBe(200)
       expect(response.body.title).toBe("Test Recipe")
-
-      await Recipe.findByIdAndDelete(testRecipe._id)
     })
 
     it("should return 404 for non-existent recipe", async () => {
