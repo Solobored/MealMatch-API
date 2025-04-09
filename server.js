@@ -20,6 +20,22 @@ import authRoutes from "./routes/authRoutes.js"
 // Import passport configuration
 import { initializePassport } from "./middleware/auth.js"
 
+// Set default environment variables if not provided
+if (!process.env.JWT_SECRET) {
+  console.warn("WARNING: JWT_SECRET not set. Using a default value for development only.")
+  process.env.JWT_SECRET = "default_jwt_secret_for_development_only"
+}
+
+if (!process.env.SESSION_SECRET) {
+  console.warn("WARNING: SESSION_SECRET not set. Using JWT_SECRET as fallback.")
+  process.env.SESSION_SECRET = process.env.JWT_SECRET
+}
+
+if (!process.env.FRONTEND_URL) {
+  console.warn("WARNING: FRONTEND_URL not set. Using default localhost URL.")
+  process.env.FRONTEND_URL = "http://localhost:5173"
+}
+
 // Debug: Check environment variables
 console.log("Environment variables loaded:")
 console.log("PORT:", process.env.PORT)
@@ -43,7 +59,7 @@ app.use(express.urlencoded({ extended: true }))
 // Session configuration for OAuth
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || process.env.JWT_SECRET || "fallback_session_secret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: { secure: process.env.NODE_ENV === "production" },
@@ -56,10 +72,22 @@ app.use(passport.session())
 initializePassport()
 
 // Connect to MongoDB
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err))
+let dbConnection = null
+const connectDB = async () => {
+  if (!dbConnection) {
+    dbConnection = await mongoose
+      .connect(process.env.MONGODB_URI)
+      .then((conn) => {
+        console.log("Connected to MongoDB")
+        return conn
+      })
+      .catch((err) => {
+        console.error("MongoDB connection error:", err)
+        throw err
+      })
+  }
+  return dbConnection
+}
 
 // Swagger configuration
 const swaggerOptions = {
@@ -103,10 +131,14 @@ app.get("/", (req, res) => {
   res.send("Welcome to MealMatch API. Visit /api-docs for documentation.")
 })
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+// Only start the server if this file is run directly (not imported in tests)
+if (process.env.NODE_ENV !== "test" || process.env.START_SERVER === "true") {
+  connectDB().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`)
+    })
+  })
+}
 
+export { app, connectDB }
 export default app
-

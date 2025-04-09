@@ -1,6 +1,6 @@
 import request from "supertest"
 import mongoose from "mongoose"
-import app from "../server.js"
+import { app, connectDB } from "../server.js"
 import Recipe from "../models/recipe.js"
 import User from "../models/user.js"
 import jwt from "jsonwebtoken"
@@ -10,10 +10,8 @@ describe("Recipe API Routes", () => {
   let authToken
 
   beforeAll(async () => {
-    // Connect to test database
-    await mongoose.connect(process.env.MONGODB_URI)
+    await connectDB()
 
-    // Create a test user
     testUser = new User({
       username: "recipeuser",
       email: "recipe@example.com",
@@ -21,15 +19,12 @@ describe("Recipe API Routes", () => {
     })
     await testUser.save()
 
-    // Generate auth token
     authToken = jwt.sign({ id: testUser._id, email: testUser.email }, process.env.JWT_SECRET, { expiresIn: "1h" })
   })
 
   afterAll(async () => {
-    // Clean up
     await User.findByIdAndDelete(testUser._id)
 
-    // Disconnect from test database
     await mongoose.connection.close()
   })
 
@@ -58,7 +53,6 @@ describe("Recipe API Routes", () => {
       expect(response.status).toBe(200)
       expect(response.body.title).toBe("Test Recipe")
 
-      // Clean up
       await Recipe.findByIdAndDelete(testRecipe._id)
     })
 
@@ -69,4 +63,3 @@ describe("Recipe API Routes", () => {
     })
   })
 })
-

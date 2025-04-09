@@ -1,12 +1,12 @@
 import request from "supertest"
 import mongoose from "mongoose"
-import app from "../server.js"
+import { app, connectDB } from "../server.js"
 import User from "../models/user.js"
 
 describe("User API Routes", () => {
   beforeAll(async () => {
     // Connect to test database
-    await mongoose.connect(process.env.MONGODB_URI)
+    await connectDB()
   })
 
   afterAll(async () => {
@@ -37,7 +37,6 @@ describe("User API Routes", () => {
       expect(response.body.username).toBe("testuser")
       expect(response.body.email).toBe("test@example.com")
 
-      // Clean up
       await User.findByIdAndDelete(testUser._id)
     })
 
@@ -48,4 +47,3 @@ describe("User API Routes", () => {
     })
   })
 })
-

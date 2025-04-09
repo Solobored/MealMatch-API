@@ -1,6 +1,6 @@
 import request from "supertest"
 import mongoose from "mongoose"
-import app from "../server.js"
+import { app, connectDB } from "../server.js"
 import Favorite from "../models/favorite.js"
 import User from "../models/user.js"
 import Recipe from "../models/recipe.js"
@@ -12,10 +12,8 @@ describe("Favorite API Routes", () => {
   let authToken
 
   beforeAll(async () => {
-    // Connect to test database
-    await mongoose.connect(process.env.MONGODB_URI)
+    await connectDB()
 
-    // Create a test user
     testUser = new User({
       username: "favoriteuser",
       email: "favorite@example.com",
@@ -23,7 +21,6 @@ describe("Favorite API Routes", () => {
     })
     await testUser.save()
 
-    // Create a test recipe
     testRecipe = new Recipe({
       title: "Favorite Test Recipe",
       description: "This is a test recipe for favorites",
@@ -34,16 +31,13 @@ describe("Favorite API Routes", () => {
     })
     await testRecipe.save()
 
-    // Generate auth token
     authToken = jwt.sign({ id: testUser._id, email: testUser.email }, process.env.JWT_SECRET, { expiresIn: "1h" })
   })
 
   afterAll(async () => {
-    // Clean up
     await User.findByIdAndDelete(testUser._id)
     await Recipe.findByIdAndDelete(testRecipe._id)
 
-    // Disconnect from test database
     await mongoose.connection.close()
   })
 
@@ -63,7 +57,6 @@ describe("Favorite API Routes", () => {
 
   describe("GET /api/favorites/:id", () => {
     it("should get a favorite by ID", async () => {
-      // First create a favorite to test with
       const testFavorite = new Favorite({
         userId: testUser._id,
         recipeId: testRecipe._id,
@@ -78,7 +71,6 @@ describe("Favorite API Routes", () => {
       expect(response.status).toBe(200)
       expect(response.body.notes).toBe("Test favorite notes")
 
-      // Clean up
       await Favorite.findByIdAndDelete(testFavorite._id)
     })
 
@@ -92,4 +84,3 @@ describe("Favorite API Routes", () => {
     })
   })
 })
-
