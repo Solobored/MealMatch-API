@@ -1,4 +1,3 @@
-// Load environment variables first
 import dotenv from "dotenv"
 dotenv.config()
 
@@ -10,17 +9,14 @@ import swaggerUi from "swagger-ui-express"
 import passport from "passport"
 import session from "express-session"
 
-// Import routes
 import userRoutes from "./routes/userRoutes.js"
 import recipeRoutes from "./routes/recipeRoutes.js"
 import ingredientRoutes from "./routes/ingredientRoutes.js"
 import favoriteRoutes from "./routes/favoriteRoutes.js"
 import authRoutes from "./routes/authRoutes.js"
 
-// Import passport configuration
 import { initializePassport } from "./middleware/auth.js"
 
-// Set default environment variables if not provided
 if (!process.env.JWT_SECRET) {
   console.warn("WARNING: JWT_SECRET not set. Using a default value for development only.")
   process.env.JWT_SECRET = "default_jwt_secret_for_development_only"
